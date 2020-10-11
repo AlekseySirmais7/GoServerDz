@@ -1,43 +1,35 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"net/http"
-	"time"
-
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"log"
+	"net/http"
 )
 
-var fooCount = prometheus.NewCounter(prometheus.CounterOpts{
-	Name: "foo_total",
-	Help: "Number of foo successfully processed.",
+var totalReqCount = prometheus.NewCounter(prometheus.CounterOpts{
+	Name: "req_total",
+	Help: "Count of total requests of this server",
 })
 
-var hits = prometheus.NewCounterVec(prometheus.CounterOpts{
-	Name: "hits",
+var oneHandlerCount = prometheus.NewCounterVec(prometheus.CounterOpts{
+	Name: "oneHandlerCount",
 }, []string{"status", "path"})
-
 
 func main() {
 
-	prometheus.MustRegister(fooCount, hits)
+	setTimeWeight()
+
+	prometheus.MustRegister(totalReqCount, oneHandlerCount)
 
 	http.Handle("/metrics", promhttp.Handler())
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		hits.WithLabelValues("200", r.URL.String()).Inc()
-		fooCount.Add(1)
-		time.Sleep(time.Second * 2)
-		fmt.Fprintf(w, "Your Page!")
+		oneHandlerCount.WithLabelValues("200", r.URL.String()).Inc()
+		totalReqCount.Add(1)
+		mainHandler(w, r)
 	})
-/*
-	http.HandleFunc("/500", func(w http.ResponseWriter, r *http.Request) {
-		hits.WithLabelValues("500", r.URL.String()).Inc()
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("error"))
-	})
-*/
-	log.Fatal(http.ListenAndServe(":8080", nil))
+
+	log.Println("start :8081")
+	log.Fatal(http.ListenAndServe(":8081", nil))
 }
