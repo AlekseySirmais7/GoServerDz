@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./handlers"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
@@ -18,7 +19,7 @@ var oneHandlerCount = prometheus.NewCounterVec(prometheus.CounterOpts{
 
 func main() {
 
-	setTimeWeight()
+	handlers.SetTimeWeight()
 
 	prometheus.MustRegister(totalReqCount, oneHandlerCount)
 
@@ -27,9 +28,9 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		oneHandlerCount.WithLabelValues("200", r.URL.String()).Inc()
 		totalReqCount.Add(1)
-		mainHandler(w, r)
+		handlers.MainHandler(w, r)
 	})
 
-	log.Println("start :8081")
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	log.Println("start :8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

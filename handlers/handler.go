@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"crypto/rand"
@@ -14,7 +14,7 @@ var defaultTime = time.Millisecond * 20
 
 var squareDeviation = time.Millisecond * 10
 
-func mainHandler(w http.ResponseWriter, r *http.Request) {
+func MainHandler(w http.ResponseWriter, r *http.Request) {
 
 	randomBigInt, err := rand.Int(rand.Reader, big.NewInt(int64(len(timeWeight))))
 	if err != nil {
@@ -39,7 +39,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 // 26
 // 4
 // 0.2
-func setTimeWeight() {
+func SetTimeWeight() {
 	for i := 0; i < 640; i++ {
 		timeWeight = append(timeWeight, 1)
 	}
