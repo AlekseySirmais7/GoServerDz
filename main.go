@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -18,7 +19,9 @@ var hits = prometheus.NewCounterVec(prometheus.CounterOpts{
 	Name: "hits",
 }, []string{"status", "path"})
 
+
 func main() {
+
 	prometheus.MustRegister(fooCount, hits)
 
 	http.Handle("/metrics", promhttp.Handler())
@@ -26,14 +29,15 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		hits.WithLabelValues("200", r.URL.String()).Inc()
 		fooCount.Add(1)
-		fmt.Fprintf(w, "foo_total increased")
+		time.Sleep(time.Second * 2)
+		fmt.Fprintf(w, "Your Page!")
 	})
-
+/*
 	http.HandleFunc("/500", func(w http.ResponseWriter, r *http.Request) {
 		hits.WithLabelValues("500", r.URL.String()).Inc()
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("error"))
 	})
-
+*/
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

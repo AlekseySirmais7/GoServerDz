@@ -1,0 +1,1 @@
+ docker build . -t apipost && docker run -p 8080:8080 -ti apipost
